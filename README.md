@@ -6,7 +6,7 @@ ForgeGrid は、セキュアな認証機能と Markdown 形式でのメモ作成
 
 ## 主な機能
 - ユーザー認証: 安全なパスワードハッシュ（PBKDF2）と Flask-Login によるセッション管理
-メモ作成・管理: シンプルなインターフェースでメモの作成、編集、削除が可能
+- メモ作成・管理: シンプルなインターフェースでメモの作成、編集、削除が可能
 - Markdown サポート: メモ本文は Markdown 記法で記述でき、GitHub 風のスタイルでプレビュー表示されます
 - 全文検索: Elasticsearch を使用した高速かつ強力な全文検索機能
 - 永続化: すべてのメモデータは PostgreSQL に保存されます
@@ -88,3 +88,19 @@ nginxにて指定したURLにアクセス
 |-- uwsgi.sock    - コンテナを起動すると作成される(これを自前のnginxに共有してください)
 `-- uwsgi_ForgeGrid.ini    - uWSGIを起動させるための設定ファイル
 ```
+
+## アプリケーション イメージ図
+#### ログイン画面
+<img width="1911" height="903" alt="image" src="https://github.com/user-attachments/assets/65f714da-4c6b-43cd-8a9b-ea1ebb9caf7d" />
+
+#### ログイン後のユーザ画面
+<img width="1912" height="899" alt="image" src="https://github.com/user-attachments/assets/3a7f6e1e-28b7-4bdc-8ade-1a4b9851e47b" />
+
+#### ノート プレビュー画面
+<img width="1899" height="899" alt="image" src="https://github.com/user-attachments/assets/482f8e62-6e81-4878-9fe1-efe282aece2b" />
+
+#### ノート編集画面
+<img width="1896" height="901" alt="image" src="https://github.com/user-attachments/assets/26ad13fc-0da2-41b7-a00e-545acd4d7502" />
+
+#### ファイルアップローダー画面
+<img width="1895" height="890" alt="image" src="https://github.com/user-attachments/assets/eaabed33-852e-4936-8b0e-9c393056a2fc" />

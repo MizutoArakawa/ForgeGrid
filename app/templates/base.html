@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - ForgeGrid</title>
+    <link href="{{ url_for('views.static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('views.static', filename='images/ForgeGrid_icon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('views.static', filename='css/bootstrap-icons.min.css') }}">
+    <script src="{{ url_for('views.static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <style>
+        body { 
+            background-color: #0d1117; 
+            color: #c9d1d9;
+            padding-top: 56px;
+            /* Sticky Footerの基本設定 */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex-grow: 1;
+        }
+        .form-signin { max-width: 400px; padding: 1rem; }
+        .form-floating:focus-within { z-index: 2; }
+        .alert-container {
+            position: fixed;
+            top: 66px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .navbar-nav .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #58a6ff;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top border-bottom border-secondary">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('views.home') }}">
+                <img src="{{ url_for('views.static', filename='images/ForgeGrid_icon.ico') }}" alt="ForgeGrid Icon" width="32" height="32" class="me-2">
+                <img src="{{ url_for('views.static', filename='images/ForgeGrid_header.png') }}" alt="ForgeGrid Logo" width="150">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if not current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.register') }}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.login') }}">Login</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.home') }}">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.note_create') }}">Create Note</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.file_upload') }}">File Trans</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ logged_user }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('views.change_password') }}">Change Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('views.logout') }}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container mt-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-dark text-white border-top border-secondary">
+        <div class="container text-center">
+            <span class="text-muted">&copy; 2025 ForgeGrid. All rights reserved.</span>
+        </div>
+    </footer>
+</body>
+</html>

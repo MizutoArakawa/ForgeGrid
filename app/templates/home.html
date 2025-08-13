@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}メモ一覧{% endblock %}
+
+{% block content %}
+<div class="container mb-5 mt-5 pt-5">
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+            <p class="fs-5 text-muted">ようこそ、{{ logged_user }}さん！</p>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center my-4">
+        <div class="col-lg-6">
+            <form id="searchForm" class="d-flex" role="search">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control form-control-lg bg-dark text-white border-secondary rounded-pill-start" placeholder="キーワードを入力してメモを検索..." aria-label="Search" id="searchInput" value="{{ request.args.get('search', '') }}">
+                    <button class="btn btn-primary rounded-pill-end" type="submit">
+                        <i class="bi bi-search"></i>検索
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="list-group shadow-sm bg-dark border-secondary" id="noteList">
+                {% if note_data %}
+                    {% for note in note_data %}
+                        <a href="{{ url_for('views.preview', note_id=note.id) }}" class="list-group-item list-group-item-action d-flex align-items-start py-3 bg-dark text-white border-secondary">
+                            <div class="flex-shrink-0 me-3">
+                                <img src="{{ url_for('views.static', filename='images/memo_icon.png') }}" alt="メモ" width="32" height="32" class="rounded-circle">
+                            </div>
+                            <div class="d-flex w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-1 text-white">{{ note.title }}</h6>
+                                    <p class="mb-1 text-muted">{{ note.content_preview }}</p>
+                                </div>
+                                <small class="text-nowrap text-muted">{{ note.date }}</small>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-5">
+                        <p class="text-muted mb-0">まだメモがありません。新しいメモを作成しましょう！</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const noteList = document.getElementById('noteList');
+        const searchForm = document.getElementById('searchForm');
+        
+        // 検索フォームのsubmitイベントを防止
+        //searchForm.addEventListener('submit', (e) => {
+            //e.preventDefault();
+            //performSearch(searchInput.value);
+        //});
+
+        // 検索ボックスの入力イベントで非同期検索を実行
+        searchInput.addEventListener('input', () => {
+            // 入力がない場合は、すべてのメモを再表示
+            // 入力がある場合は、即座に検索
+            performSearch(searchInput.value);
+        });
+        
+        function performSearch(searchTerm) {
+            const searchUrl = "{{ url_for('views.search_notes_async') }}";
+            fetch(searchUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `search=${searchTerm}`,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('サーバーエラーが発生しました。');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let resultsHTML = '';
+                if (data && data.length > 0) {
+                    data.forEach(note => {
+                        const previewUrl = `/ForgeGrid/preview/${note.id}`;
+                        const memoIconUrl = "{{ url_for('views.static', filename='images/memo_icon.png') }}";
+                        resultsHTML += `
+                            <a href="${previewUrl}" class="list-group-item list-group-item-action d-flex align-items-start py-3 bg-dark text-white border-secondary">
+                                <div class="flex-shrink-0 me-3">
+                                    <img src="${memoIconUrl}" alt="メモ" width="32" height="32" class="rounded-circle">
+                                </div>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1 text-white">${note.title}</h6>
+                                        <p class="mb-1 text-muted">${note.content_preview}</p>
+                                    </div>
+                                    <small class="text-nowrap text-muted">${note.date}</small>
+                                </div>
+                            </a>
+                        `;
+                    });
+                } else {
+                    resultsHTML = `
+                        <div class="text-center p-5">
+                            <p class="text-muted mb-0">${searchTerm ? '一致するメモはありません。' : 'まだメモがありません。新しいメモを作成しましょう！'}</p>
+                        </div>
+                    `;
+                }
+                noteList.innerHTML = resultsHTML;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorHTML = `
+                    <div class="text-center p-5 text-danger">
+                        <p class="mb-0">検索中にエラーが発生しました。</p>
+                    </div>
+                `;
+                noteList.innerHTML = errorHTML;
+            });
+        }
+    });
+</script>
+{% endblock %}

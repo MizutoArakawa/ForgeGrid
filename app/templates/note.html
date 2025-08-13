@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block title %}メモ編集{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        {% if note_data.id is none %}
+        <h1 class="h3 fw-bold text-white">Create New Note</h1>
+        {% else %}
+        <h1 class="h3 fw-bold text-white">Edit Note</h1>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="bi bi-trash"></i>Delete
+        </button>
+        {% endif %}
+    </div>
+
+    <form action="{% if note_data.id is none %}{{ url_for('views.note_create') }}{% else %}{{ url_for('views.note_edit', note_id=note_data.id) }}{% endif %}" method="post" class="needs-validation" novalidate>
+        <div class="mb-4">
+            <label for="noteTitle" class="form-label visually-hidden">Title</label>
+            <input type="text" class="form-control form-control-lg bg-dark text-white border-secondary fw-bold" id="noteTitle" name="title" value="{{ note_data.title or '' }}" placeholder="タイトルを入力" required>
+            <div class="invalid-feedback">
+                タイトルは必須です
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 bg-dark border-secondary">
+                    <div class="card-header bg-dark border-secondary text-white fw-bold d-flex justify-content-between align-items-center">
+                        <span>Markdownエディタ</span>
+                    </div>
+                    <div class="card-body p-0 d-flex flex-column">
+                        <textarea class="form-control bg-dark text-white border-0 rounded-0 flex-grow-1" id="markdownTextarea" name="content" rows="15" style="resize: vertical;" required>{{ note_data.content or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100 bg-dark border-secondary">
+                    <div class="card-header bg-dark border-secondary text-white fw-bold">
+                        Preview
+                    </div>
+                    <div class="card-body p-3 markdown-body" id="preview" style="overflow-y: auto;">
+                        {% if note_data.content %}
+                            {{ note_data.content | markdown_to_html }}
+                        {% else %}
+                            <p class="text-muted text-center">ここにMarkdownで書いた内容が表示されます</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="fixed-bottom bg-dark shadow-lg">
+            <div class="container py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <a class="btn btn-outline-secondary me-2" href="{% if note_data.id is none %}{{ url_for('views.home') }}{% else %}{{ url_for('views.preview', note_id=note_data.id) }}{% endif %}">
+                        <i class="bi bi-arrow-left"></i>Back
+                    </a>
+                </div>
+                <div>
+                    <button class="btn btn-success" type="submit">
+                        <i class="bi bi-save"></i>Save
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </form>
+</div>
+
+{% if note_data.id is not none %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="deleteModalLabel">Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-white">
+                本当にこのメモを削除しますか？この操作は元に戻せません。
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="{{ url_for('views.note_delete', note_id=note_data.id) }}" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    /* GitHub風の背景と文字色 */
+    .markdown-body {
+        background-color: #0d1117;
+        color: #c9d1d9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+        line-height: 1.6;
+        /* 追加: GitHub風の全体的な文字サイズ */
+        font-size: 16px; 
+    }
+    
+    /* --- コードブロックのスタイル --- */
+    /* ``` で囲んだブロックコード全体 */
+    .markdown-body pre {
+        background-color: #161b22;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        /* GitHub風のマージンを再現 */
+        margin-top: 0;
+        margin-bottom: 16px;
+        position: relative;
+    }
+    
+    /* コードブロック内のコード要素 */
+    .markdown-body pre code {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+        /* hljsクラスを適用する際のスタイル */
+        color: #c9d1d9;
+    }
+
+    /* GitHubは pre と code を分けてスタイルを適用するため、変更 */
+    .markdown-body pre code.hljs {
+        background-color: transparent !important;
+        color: #c9d1d9;
+        padding: 0;
+    }
+
+    /* --- インラインコードのスタイル --- */
+    /* ` で囲んだインラインコード */
+    .markdown-body code {
+        background-color: rgba(110,118,129,0.4);
+        border-radius: 6px;
+        padding: 0.2em 0.4em;
+        font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        font-size: 85%; /* GitHubのインラインコードは少し小さめ */
+    }
+
+    /* --- 見出しのスタイル --- */
+    .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+        color: #fff;
+        border-bottom: 1px solid #30363d;
+        padding-bottom: .3em;
+        margin-bottom: 16px;
+        margin-top: 24px; /* 追加: 上部マージンで区切りを明確に */
+    }
+
+    /* --- リンクと引用のスタイル --- */
+    .markdown-body a {
+        color: #58a6ff;
+    }
+    .markdown-body blockquote {
+        color: #8b949e;
+        border-left: .25em solid #444c56;
+        padding: 0 1em;
+    }
+
+    /* --- テーブルのスタイル --- */
+    .markdown-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+        border-spacing: 0;
+    }
+    .markdown-body th, .markdown-body td {
+        padding: 6px 13px;
+        border: 1px solid #30363d;
+        /* 追加: GitHubはtdも左寄せがデフォルト */
+        text-align: left; 
+    }
+    .markdown-body th {
+        background-color: #161b22;
+        font-weight: 600;
+        text-align: left;
+    }
+    .markdown-body tr:nth-child(2n) {
+        background-color: #0d1117;
+    }
+    .markdown-body tr:nth-child(2n+1) {
+        background-color: #161b22;
+    }
+    
+    /* --- フォームとカードのスタイル --- */
+    .form-control.bg-dark {
+        background-color: #161b22 !important;
+        color: #c9d1d9;
+        border: 1px solid #30363d; /* 追加: GitHubのフォームは境界線がある */
+    }
+    .card-header.bg-dark {
+        background-color: #161b22 !important;
+        border-bottom: 1px solid #30363d; /* 追加: GitHubのカードヘッダーは境界線がある */
+    }
+</style>
+
+
+<script src="{{ url_for('views.static', filename='js/marked.min.js') }}"></script>
+<script src="{{ url_for('views.static', filename='js/index.umd.min.js') }}"></script>
+<script src="{{ url_for('views.static', filename='js/highlight.min.js') }}"></script>
+<script>
+    // Marked.jsとHighlight.jsの初期化
+    marked.setOptions({
+        highlight: function(code, lang) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        },
+        langPrefix: 'hljs language-',
+    });
+
+    const markdownTextarea = document.getElementById('markdownTextarea');
+    const previewDiv = document.getElementById('preview');
+
+    // テキストエリアの入力時にプレビューを更新
+    function updatePreview() {
+        const markdownText = markdownTextarea.value || '';
+        previewDiv.innerHTML = marked.parse(markdownText);
+    }
+    
+    // 初回レンダリング時と入力時にプレビューを更新
+    markdownTextarea.addEventListener('input', updatePreview);
+    window.addEventListener('DOMContentLoaded', updatePreview);
+
+    // テキストエリアの自動リサイズ機能
+    const setTextareaHeight = () => {
+        markdownTextarea.style.height = 'auto';
+        markdownTextarea.style.height = `${markdownTextarea.scrollHeight}px`;
+    };
+    markdownTextarea.addEventListener('input', setTextareaHeight);
+    window.addEventListener('DOMContentLoaded', setTextareaHeight);
+    
+    // 画像貼り付け機能
+    markdownTextarea.addEventListener('paste', (event) => {
+        const clipboardData = event.clipboardData || window.clipboardData;
+        const items = clipboardData.items;
+        
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    event.preventDefault(); // デフォルト動作をキャンセル
+                    const file = items[i].getAsFile();
+                    const reader = new FileReader();
+                    
+                    reader.onload = () => {
+                        const base64Data = reader.result;
+                        fetch('{{ url_for("views.upload_image") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: base64Data })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const startPos = markdownTextarea.selectionStart;
+                            const endPos = markdownTextarea.selectionEnd;
+                            const scrollTop = markdownTextarea.scrollTop;
+                            const newValue =
+                                markdownTextarea.value.substring(0, startPos) +
+                                data.markdown + "\n" +
+                                markdownTextarea.value.substring(endPos);
+                            
+                            markdownTextarea.value = newValue;
+                            
+                            // カーソルとスクロール位置を調整
+                            markdownTextarea.selectionStart = startPos + data.markdown.length + 1;
+                            markdownTextarea.selectionEnd = markdownTextarea.selectionStart;
+                            markdownTextarea.scrollTop = scrollTop;
+                            
+                            updatePreview(); // プレビューも更新
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
+            }
+        }
+    });
+
+    // 既存の削除JS関数をそのまま残す
+    function DeleteNote(note_id) {
+        if (confirm('Do you really want to erase this note?') == true) {
+            alert("削除完了");
+            window.location.href = '{{ url_for("views.note_delete", note_id=note_data.id) }}';
+        } else {
+            alert("削除はキャンセルされました");
+        }
+    }
+</script>
+{% endblock %}

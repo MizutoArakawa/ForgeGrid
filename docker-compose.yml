@@ -1,0 +1,40 @@
+version: 'YOUR VERSION'
+services:
+  forgegrid:
+    container_name: forge-grid
+    image: forgegrid:3.2.1
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+      - <YOUR PATH>/home/ForgeGrid:/ForgeGrid
+    environment:
+      - ELASTICSEARCH_HOST=<YOUR Elastic_IP>
+      - ELASTICSEARCH_USER=elastic # あるいは別のユーザー名
+      - ELASTICSEARCH_PASSWORD=PASSWORD # Elasticsearchの実際のパスワード
+      - ELASTIC_CA_PATH=/ForgeGrid/app/certs/ca/ca.crt # Elasticsearchにて生成したca.crtを格納
+      # 環境変数を使ってDB接続情報をコンテナに渡す
+      - SQLALCHEMY_DATABASE_URI=postgresql://USER:POSTGRES_DB_PASSWORD@db:5432/DATABASE_NAME
+      # 環境変数を使ってRedis接続情報をコンテナに渡す
+      - REDIS_HOST=redis
+    depends_on:
+      - db
+      - redis
+  # PostgreSQLデータベースサービス
+  db:
+    container_name: forge-postgresql
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: USER
+      POSTGRES_PASSWORD: POSTGRES_DB_PASSWORD
+      POSTGRES_DB: DATABASE_NAME
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  # Redisサービス（セッション管理用）
+  redis:
+    container_name: forge-redis
+    image: redis:6-alpine
+    restart: always
+volumes:
+  postgres_data: null

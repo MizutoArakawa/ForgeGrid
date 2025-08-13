@@ -1,0 +1,7 @@
+uwsgi.log
+uwsgi.sock
+app/certs/ca/ca.crt
+instance/new-notes-collection.db
+FILE-UPLOAD_DIR/MizutoArakawa/
+app/__pycache__/
+app/__pycache__/*

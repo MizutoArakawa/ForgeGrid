@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm mt-5">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <img class="mb-2" src="{{ url_for('views.static', filename='images/ForgeGrid_icon.ico') }}" alt="User Icon" width="72" height="57">
+                    <h1 class="h3 mb-3 fw-normal">Register User</h1>
+                </div>
+                
+                <form action="{{ url_for('views.register') }}" method="post">
+                    {{ form.csrf_token }}
+
+                    <div class="form-floating mb-3">
+                        {{ form.username(class="form-control", placeholder="Username", id="username") }}
+                        {{ form.username.label(for="username") }}
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.username.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        {{ form.password(class="form-control", placeholder="Password", id="password") }}
+                        {{ form.password.label(for="password") }}
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.confirm_password(class="form-control", placeholder="Confirm Password", id="confirm_password") }}
+                        {{ form.confirm_password.label(for="confirm_password") }}
+                        {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.confirm_password.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button class="btn btn-primary w-100 py-2 mt-3" type="submit">
+                        {{ form.submit.label }}
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="mb-0">すでにアカウントをお持ちですか？ <a href="{{ url_for('views.login') }}">ログインはこちら</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -51,4 +51,4 @@ class Config:
     ELASTICSEARCH_USER = os.environ.get('ELASTICSEARCH_USER', 'elastic')
     ELASTICSEARCH_PASSWORD = os.environ.get('ELASTICSEARCH_PASSWORD')
     # Dockerコンテナ内のCA証明書のパス
-    CA_CERTS_PATH = os.environ.get('ELASTIC_CA_PATH')
+    CA_CERTS_PATH = os.environ.get('ELASTICSEARCH_CA')

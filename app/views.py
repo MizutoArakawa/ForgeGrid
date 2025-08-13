@@ -384,9 +384,23 @@ def delete(file):
         flash("ファイルが見つかりません。", "danger")
     return redirect(url_for('views.file_upload'))
 
-@bp.route('/ForgeGrid/<filename>')
+@bp.route('/ForgeGrid/preview/<filename>')
 @login_required
-def Markdown_imagefile(filename):
+def preview_Markdown_imagefile(filename):
+    """Markdown内で参照される画像を直接表示するためのルート"""
+    user_upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)
+    return send_from_directory(user_upload_folder, secure_filename(filename))
+
+@bp.route('/ForgeGrid/note_edit/<filename>')
+@login_required
+def note_edit_Markdown_imagefile(filename):
+    """Markdown内で参照される画像を直接表示するためのルート"""
+    user_upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)
+    return send_from_directory(user_upload_folder, secure_filename(filename))
+
+@bp.route('/ForgeGrid/note_create/<filename>')
+@login_required
+def note_create_Markdown_imagefile(filename):
     """Markdown内で参照される画像を直接表示するためのルート"""
     user_upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)
     return send_from_directory(user_upload_folder, secure_filename(filename))

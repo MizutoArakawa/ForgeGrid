@@ -398,9 +398,9 @@ def note_edit_Markdown_imagefile(filename):
     user_upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)
     return send_from_directory(user_upload_folder, secure_filename(filename))
 
-@bp.route('/ForgeGrid/note_create/<filename>')
+@bp.route('/ForgeGrid/<filename>')
 @login_required
-def note_create_Markdown_imagefile(filename):
+def Markdown_imagefile(filename):
     """Markdown内で参照される画像を直接表示するためのルート"""
     user_upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)
     return send_from_directory(user_upload_folder, secure_filename(filename))

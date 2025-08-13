@@ -245,46 +245,42 @@
     markdownEditor.addEventListener('paste', (event) => {
         const clipboardData = event.clipboardData || window.clipboardData;
         const items = clipboardData.items;
-
+        
         if (items) {
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
+                    event.preventDefault(); // デフォルト動作をキャンセル
                     const file = items[i].getAsFile();
                     const reader = new FileReader();
+                    
                     reader.onload = () => {
                         const base64Data = reader.result;
-                        const startPos = markdownEditor.selectionStart;
-                        const endPos = markdownEditor.selectionEnd;
-                        const scrollTop = markdownEditor.scrollTop;
-
                         fetch('{{ url_for("views.upload_image") }}', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ image: base64Data })
                         })
                         .then(response => response.json())
                         .then(data => {
-                            const markdownImageTag = `![${data.filename}](${data.url})`;
+                            const startPos = markdownEditor.selectionStart;
+                            const endPos = markdownEditor.selectionEnd;
+                            const scrollTop = markdownEditor.scrollTop;
                             const newValue =
                                 markdownEditor.value.substring(0, startPos) +
-                                markdownImageTag + "\n" +
-                                markdownEditor.value.substring(endPos, markdownEditor.value.length);
+                                data.markdown + "\n" +
+                                markdownEditor.value.substring(endPos);
                             
                             markdownEditor.value = newValue;
-
-                            // カーソル位置を挿入後の適切な場所に設定
-                            markdownEditor.selectionStart = startPos + markdownImageTag.length + 1;
+                            
+                            // カーソルとスクロール位置を調整
+                            markdownEditor.selectionStart = startPos + data.markdown.length + 1;
                             markdownEditor.selectionEnd = markdownEditor.selectionStart;
                             markdownEditor.scrollTop = scrollTop;
                             
-                            // プレビューを更新
-                            updatePreview();
+                            updatePreview(); // プレビューも更新
                         });
                     };
                     reader.readAsDataURL(file);
-                    event.preventDefault();
                     return;
                 }
             }

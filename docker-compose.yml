@@ -2,7 +2,7 @@ version: 'YOUR VERSION'
 services:
   forgegrid:
     container_name: forge-grid
-    image: forgegrid:3.2.1
+    image: forgegrid:3.2.2
     restart: always
     ports:
       - 5000:5000

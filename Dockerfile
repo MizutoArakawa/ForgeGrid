@@ -1,5 +1,5 @@
 # ベースイメージとして python v3.10 を使用する
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y --no-install-recommends \

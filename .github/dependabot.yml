@@ -3,27 +3,38 @@
 # Please see the documentation for all configuration options:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
+# .github/dependabot.yml
+
 version: 2
 updates:
-  - package-ecosystem: "npm"
+  # Dockerfileの更新を監視
+  - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
       time: "06:00"
-      timezone: "Japan"
+      timezone: "Asia/Tokyo"
     commit-message:
-      prefix: "Common"
+      prefix: "docker"
       include: "scope"
     labels:
       - "dependencies"
-  - package-ecosystem: "npm"
-    directory: "app/"
+      - "docker"
+
+  # Pythonのpipパッケージの更新を監視
+  - package-ecosystem: "pip"
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
       time: "06:00"
-      timezone: "Japan"
+      timezone: "Asia/Tokyo"
     commit-message:
-      prefix: "Frontend"
+      prefix: "pip"
       include: "scope"
     labels:
       - "dependencies"
+      - "python"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"

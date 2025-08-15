@@ -31,7 +31,7 @@ ForgeGrid は、セキュアな認証機能と Markdown 形式でのメモ作成
 #### 手順
 `git clone https://github.com/MizutoArakawa/ForgeGrid.git`  
 `cd ForgeGrid`  
-`docker build -t forgegrid:3.2.1 .`  
+`docker build -t forgegrid:3.2.2 .`  
 docker-compose.ymlを修正  
 `docker-compose up -d`  
 作成されたuwsgi.sockにアクセスできるようにnginxの設定を修正  
